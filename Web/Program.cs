@@ -6,12 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-// Configure the database for the context
-builder.Services.AddDbContext<AssignmentContext>(
-    options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("AssignmentAppConnection")));
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

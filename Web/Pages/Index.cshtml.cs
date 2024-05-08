@@ -14,17 +14,17 @@ public class IndexModel : PageModel
         _logger = logger;
     }
 
-    public string? SearchString { get; set; }    
+    public string? SearchString { get; set; }
     public List<Document>? DocumentsList { get; set; }
 
     public void OnGet()
     {
-        DocumentsList =  DatabaseAccess.GetDocuments();
+        DocumentsList = DatabaseAccess.GetDocuments();
     }
 
     public void OnPost(string searchString)
     {
         SearchString = searchString;
-        DocumentsList =  DatabaseAccess.GetDocuments(SearchString);
-    }    
+        DocumentsList = DatabaseAccess.GetDocuments(SearchString);
+    }
 }

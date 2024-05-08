@@ -1,30 +1,28 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Web.Backend.Data;
 using Web.Backend.Models;
 
 namespace Web.Backend
 {
     public static class DatabaseAccess
     {
-        public static List<Document>? GetDocuments(string? searchString = null)
+        private static readonly AssignmentContext _context = new AssignmentContext(new DbContextOptions<AssignmentContext>());
+
+        public static List<Document> GetDocuments(string? searchString = null)
         {
-            return new List<Document>()
+            var query = _context.Documents
+                .Include(d => d.UploadedBy) // Assures that the UploadedBy navigation property is included
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
             {
-                new() 
-                {
-                    Id = 174, 
-                    FileName = "The Caves of Steel.pdf", 
-                    UploadedDate = DateTime.Parse("2024-03-29"),
-                    UploadedBy = new User(){Id = 101, FirstName = "Isaac", LastName = "Asimov"}
-                },
-                new() 
-                {
-                    Id = 192, 
-                    FileName = "Refactoring.pdf", 
-                    UploadedDate = DateTime.Parse("2024-04-01"),
-                    UploadedBy = new User(){Id = 108, FirstName = "Martin", LastName = "Fowler"}
-                }
-            }.Where(x => searchString == null || x.FileName.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                query = query.Where(d => d.FileName.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return query.ToList();
         }
     }
 }
