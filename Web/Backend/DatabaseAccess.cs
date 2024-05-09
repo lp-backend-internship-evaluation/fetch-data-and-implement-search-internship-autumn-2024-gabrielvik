@@ -1,30 +1,62 @@
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Web.Backend.Data;
 using Web.Backend.Models;
 
 namespace Web.Backend
 {
     public static class DatabaseAccess
     {
-        public static List<Document>? GetDocuments(string? searchString = null)
+        private static readonly AssignmentContext _context = new AssignmentContext(new DbContextOptions<AssignmentContext>());
+
+        public static List<Document> GetDocuments(string? searchString = null)
         {
-            return new List<Document>()
+            var query = _context.Documents
+                .Include(d => d.UploadedBy)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
             {
-                new() 
+                string searchLower = searchString.ToLower();
+
+                // Check if the search string is a valid date
+                if (DateTime.TryParse(searchLower, out DateTime searchDate))
                 {
-                    Id = 174, 
-                    FileName = "The Caves of Steel.pdf", 
-                    UploadedDate = DateTime.Parse("2024-03-29"),
-                    UploadedBy = new User(){Id = 101, FirstName = "Isaac", LastName = "Asimov"}
-                },
-                new() 
-                {
-                    Id = 192, 
-                    FileName = "Refactoring.pdf", 
-                    UploadedDate = DateTime.Parse("2024-04-01"),
-                    UploadedBy = new User(){Id = 108, FirstName = "Martin", LastName = "Fowler"}
+                    // If it's a valid date, filter by UploadedDate
+                    query = query.Where(d => d.UploadedDate.Date == searchDate.Date);
                 }
-            }.Where(x => searchString == null || x.FileName.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                else
+                {
+                    // Otherwise, perform text search on FileName, FirstName, and LastName
+                    query = query.Where(d =>
+                        EF.Functions.Like(d.FileName.ToLower(), "%" + searchLower + "%") ||
+                        EF.Functions.Like(d.UploadedBy.FirstName.ToLower(), "%" + searchLower + "%") ||
+                        EF.Functions.Like(d.UploadedBy.LastName.ToLower(), "%" + searchLower + "%"));
+                }
+            }
+
+            return query.ToList();
         }
+        public static void DeleteDocument(int id)
+        {
+            var documentToDelete = _context.Documents.Find(id);
+
+            if (documentToDelete != null)
+            {
+                _context.Documents.Remove(documentToDelete);
+                _context.SaveChanges();
+            }
+        }
+        public static void EditDocument(int id, string newFileName)
+        {
+            var documentToEdit = _context.Documents.Find(id);
+
+            if (documentToEdit != null)
+            {
+                documentToEdit.FileName = newFileName;
+
+                _context.SaveChanges();
+            }
+        }
+
     }
 }
