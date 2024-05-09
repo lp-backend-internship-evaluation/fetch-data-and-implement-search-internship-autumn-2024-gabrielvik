@@ -8,10 +8,7 @@ namespace Web.Backend.Data
         public DbSet<Document> Documents { get; set; }
         public DbSet<User> Users { get; set; }
 
-        public AssignmentContext(DbContextOptions<AssignmentContext> options)
-            : base(options)
-        {
-        }
+        public AssignmentContext(DbContextOptions<AssignmentContext> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Web.Backend.Data;
 using Web.Backend.Models;
 
@@ -14,12 +11,12 @@ namespace Web.Backend
         public static List<Document> GetDocuments(string? searchString = null)
         {
             var query = _context.Documents
-                .Include(d => d.UploadedBy) // Include the UploadedBy navigation property
+                .Include(d => d.UploadedBy)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                string searchLower = searchString.ToLower(); // Convert search string to lower case
+                string searchLower = searchString.ToLower();
 
                 // Check if the search string is a valid date
                 if (DateTime.TryParse(searchLower, out DateTime searchDate))

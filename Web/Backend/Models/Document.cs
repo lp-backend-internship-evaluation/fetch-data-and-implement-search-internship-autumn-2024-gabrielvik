@@ -1,5 +1,3 @@
-using System;
-
 namespace Web.Backend.Models
 {
     public class Document
