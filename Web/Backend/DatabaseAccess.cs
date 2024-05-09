@@ -39,5 +39,27 @@ namespace Web.Backend
 
             return query.ToList();
         }
+        public static void DeleteDocument(int id)
+        {
+            var documentToDelete = _context.Documents.Find(id);
+
+            if (documentToDelete != null)
+            {
+                _context.Documents.Remove(documentToDelete);
+                _context.SaveChanges();
+            }
+        }
+        public static void EditDocument(int id, string newFileName)
+        {
+            var documentToEdit = _context.Documents.Find(id);
+
+            if (documentToEdit != null)
+            {
+                documentToEdit.FileName = newFileName;
+
+                _context.SaveChanges();
+            }
+        }
+
     }
 }

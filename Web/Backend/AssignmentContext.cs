@@ -15,7 +15,6 @@ namespace Web.Backend.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Configure your database connection string here
             optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=AssignmentDB");
         }
     }

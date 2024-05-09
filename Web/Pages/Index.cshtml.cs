@@ -1,30 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using Web.Backend;
 using Web.Backend.Models;
 
-namespace Web.Pages;
-
-public class IndexModel : PageModel
+namespace Web.Pages
 {
-    private readonly ILogger<IndexModel> _logger;
-
-    public IndexModel(ILogger<IndexModel> logger)
+    public class IndexModel : PageModel
     {
-        _logger = logger;
-    }
+        private readonly ILogger<IndexModel> _logger;
 
-    public string? SearchString { get; set; }
-    public List<Document>? DocumentsList { get; set; }
+        public IndexModel(ILogger<IndexModel> logger)
+        {
+            _logger = logger;
+        }
 
-    public void OnGet()
-    {
-        DocumentsList = DatabaseAccess.GetDocuments();
-    }
+        public string? SearchString { get; set; }
+        public List<Document>? DocumentsList { get; set; }
 
-    public void OnPost(string searchString)
-    {
-        SearchString = searchString;
-        DocumentsList = DatabaseAccess.GetDocuments(SearchString);
+        public void OnGet()
+        {
+            DocumentsList = DatabaseAccess.GetDocuments();
+        }
+
+        public IActionResult OnPost(string searchString)
+        {
+            SearchString = searchString;
+            DocumentsList = DatabaseAccess.GetDocuments(SearchString);
+            return Page();
+        }
+
+        public IActionResult OnPostDeleteDocument(int documentId)
+        {
+            DatabaseAccess.DeleteDocument(documentId);
+            return RedirectToPage("/Index");
+        }
     }
 }
